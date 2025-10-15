@@ -27,7 +27,10 @@ const useProduct = (id) => {
               setLoading(false);
             }
           } else {
-            setError('Product not found.');
+            if (didMount) {
+              setError('Product not found.');
+              setLoading(false);
+            }
           }
         }
       } catch (err) {

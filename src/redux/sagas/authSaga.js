@@ -39,8 +39,19 @@ function* handleError(e) {
     case 'auth/reset-password-error':
       yield put(setAuthStatus({ ...obj, message: 'Failed to send password reset email. Did you type your email correctly?' }));
       break;
-    default:
+    case 'auth/operation-not-supported-in-this-environment':
       yield put(setAuthStatus({ ...obj, message: e.message }));
+      break;
+    case 'auth/no-current-user':
+      yield put(setAuthStatus({ ...obj, message: 'No user is currently signed in' }));
+      break;
+    default:
+      // Handle Firebase API key errors gracefully
+      if (e.message?.includes('API key not valid') || e.message?.includes('INVALID_ARGUMENT')) {
+        yield put(setAuthStatus({ ...obj, message: 'Demo mode: Use test@example.com with password123 or admin@example.com with admin123' }));
+      } else {
+        yield put(setAuthStatus({ ...obj, message: e.message }));
+      }
       break;
   }
 }

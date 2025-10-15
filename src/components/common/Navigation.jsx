@@ -69,7 +69,7 @@ const Navigation = () => {
   return (
     <nav className="navigation" ref={navbar}>
       <div className="logo">
-        <Link onClick={onClickLink} to="/"><img alt="Logo" src={logo} /></Link>
+        <Link onClick={onClickLink} to="/"><img width={20} height={20} alt="Logo" src={logo} /></Link>
       </div>
       <ul className="navigation-menu-main">
         <li><NavLink activeClassName="navigation-menu-active" exact to={ROUTE.HOME}>Home</NavLink></li>
@@ -104,7 +104,7 @@ const Navigation = () => {
             )}
           </BasketToggle>
         </li>
-        {store.user ? (
+        {/* {store.user ? (
           <li className="navigation-menu-item">
             <UserAvatar />
           </li>
@@ -129,7 +129,7 @@ const Navigation = () => {
               </Link>
             )}
           </li>
-        )}
+        )} */}
       </ul>
     </nav>
   );

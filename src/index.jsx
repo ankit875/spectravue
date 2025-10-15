@@ -22,7 +22,8 @@ const root = document.getElementById('app');
 // Render the preloader on initial load
 render(<Preloader />, root);
 
-firebase.auth.onAuthStateChanged((user) => {
+// Handle auth state changes for both Firebase and dummy mode
+const handleAuthStateChange = (user) => {
   if (user) {
     store.dispatch(onAuthStateSuccess(user));
   } else {
@@ -30,7 +31,19 @@ firebase.auth.onAuthStateChanged((user) => {
   }
   // then render the app after checking the auth state
   render(<App store={store} persistor={persistor} />, root);
-});
+};
+
+// Check if Firebase auth is available or if we're in dummy mode
+if (firebase.auth && typeof firebase.auth.onAuthStateChanged === 'function') {
+  // Real Firebase mode
+  firebase.auth.onAuthStateChanged(handleAuthStateChange);
+} else {
+  // Dummy mode - set up auth state handler and render app
+  firebase.setAuthStateChangeHandler(handleAuthStateChange);
+  setTimeout(() => {
+    handleAuthStateChange(null); // Start with no user
+  }, 100);
+}
 
 if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {

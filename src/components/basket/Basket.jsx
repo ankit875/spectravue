@@ -1,17 +1,16 @@
 /* eslint-disable max-len */
 import { BasketItem, BasketToggle } from '@/components/basket';
-import { Boundary, Modal } from '@/components/common';
+import { Boundary } from '@/components/common';
 import { CHECKOUT_STEP_1 } from '@/constants/routes';
-import firebase from 'firebase/firebase';
+import firebase from '@/services/firebase';
 import { calculateTotal, displayMoney } from '@/helpers/utils';
-import { useDidMount, useModal } from '@/hooks';
+import { useDidMount } from '@/hooks';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { clearBasket } from '@/redux/actions/basketActions';
 
 const Basket = () => {
-  const { isOpenModal, onOpenModal, onCloseModal } = useModal();
   const { basket, user } = useSelector((state) => ({
     basket: state.basket,
     user: state.auth
@@ -22,7 +21,7 @@ const Basket = () => {
   const didMount = useDidMount();
 
   useEffect(() => {
-    if (didMount && firebase.auth.currentUser && basket.length !== 0) {
+    if (didMount && user && firebase.auth?.currentUser && basket.length !== 0) {
       firebase.saveBasketItems(basket, firebase.auth.currentUser.uid)
         .then(() => {
           console.log('Item saved to basket');
@@ -34,18 +33,10 @@ const Basket = () => {
   }, [basket.length]);
 
   const onCheckOut = () => {
-    if ((basket.length !== 0 && user)) {
+    if (basket.length !== 0) {
       document.body.classList.remove('is-basket-open');
       history.push(CHECKOUT_STEP_1);
-    } else {
-      onOpenModal();
     }
-  };
-
-  const onSignInClick = () => {
-    onCloseModal();
-    document.body.classList.remove('basket-open');
-    history.push(CHECKOUT_STEP_1);
   };
 
   const onClearBasket = () => {
@@ -56,30 +47,6 @@ const Basket = () => {
 
   return user && user.role === 'ADMIN' ? null : (
     <Boundary>
-      <Modal
-        isOpen={isOpenModal}
-        onRequestClose={onCloseModal}
-      >
-        <p className="text-center">You must sign in to continue checking out</p>
-        <br />
-        <div className="d-flex-center">
-          <button
-            className="button button-border button-border-gray button-small"
-            onClick={onCloseModal}
-            type="button"
-          >
-            Continue shopping
-          </button>
-          &nbsp;
-          <button
-            className="button button-small"
-            onClick={onSignInClick}
-            type="button"
-          >
-            Sign in to checkout
-          </button>
-        </div>
-      </Modal>
       <div className="basket">
         <div className="basket-list">
           <div className="basket-header">
